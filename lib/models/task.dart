@@ -3,5 +3,5 @@ class Task {
 
   String title;
   DateTime date;
-  String? description;
+  String description;
 }

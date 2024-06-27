@@ -12,7 +12,8 @@ class ToDoListPage extends StatefulWidget {
 
 class _ToDoListPageState extends State<ToDoListPage> {
   final TextEditingController taskController = TextEditingController();
-  final TextEditingController taskDescriptionController = TextEditingController();
+  final TextEditingController taskDescriptionController =
+      TextEditingController();
 
   List<Task> tasks = [];
   Task? deletedTask;
@@ -38,7 +39,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
                 const SizedBox(height: 8),
                 TextField(
                   controller: taskDescriptionController,
-                  maxLines: 3,
+                  maxLines: 2,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: "Descrição da tarefa",
@@ -46,30 +47,42 @@ class _ToDoListPageState extends State<ToDoListPage> {
                 ),
                 const SizedBox(height: 8),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Expanded(
-                      child: TextField(
-                        controller: taskController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: "Adicione uma tarefa",
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () {
                         String task = taskController.text;
+
+                        if (task.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text(
+                                "Você precisa informar o título da tarefa!",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              backgroundColor: Colors.orange[400],
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+
+                          return;
+                        }
+
                         setState(() {
-                          Task newTask =
-                              Task(title: task, date: DateTime.now());
+                          Task newTask = Task(
+                              title: task,
+                              date: DateTime.now(),
+                              description: taskDescriptionController.text);
                           tasks.add(newTask);
                         });
                         taskController.clear();
+                        taskDescriptionController.clear();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff00bff3),
-                        padding: const EdgeInsets.all(14),
+                        padding: const EdgeInsets.only(left: 10, right: 10),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6),
                         ),
@@ -104,10 +117,11 @@ class _ToDoListPageState extends State<ToDoListPage> {
                       ),
                     ),
                     ElevatedButton(
-                      onPressed: handleConfirmDeleteTasksDialog,
+                      onPressed: tasks.isNotEmpty ? handleConfirmDeleteTasksDialog : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff00bff3),
-                        padding: const EdgeInsets.all(14),
+                        backgroundColor: const Color(0xFFFE4A49),
+                        padding: const EdgeInsets.only(left: 10, right: 10),
+                        disabledBackgroundColor: Colors.grey[400],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6),
                         ),

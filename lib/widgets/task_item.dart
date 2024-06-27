@@ -48,15 +48,25 @@ class TaskItem extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                DateFormat("dd/MM/yyyy - HH:mm").format(task.date),
-                style: const TextStyle(fontSize: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    task.title,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    DateFormat("dd/MM/yyyy - HH:mm").format(task.date),
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ],
               ),
               Text(
-                task.title,
+                task.description,
                 style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
+                    const TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+              )
             ],
           ),
         ),
