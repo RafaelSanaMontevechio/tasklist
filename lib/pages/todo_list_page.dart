@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/task.dart';
+import '../repositories/task_list_repository.dart';
 import '../widgets/task_item.dart';
 
 class ToDoListPage extends StatefulWidget {
@@ -14,10 +15,22 @@ class _ToDoListPageState extends State<ToDoListPage> {
   final TextEditingController taskController = TextEditingController();
   final TextEditingController taskDescriptionController =
       TextEditingController();
+  final TaskListRepository taskListRepository = TaskListRepository();
 
   List<Task> tasks = [];
   Task? deletedTask;
   int? deletedTaskIndex;
+
+  @override
+  void initState() {
+    super.initState();
+
+    taskListRepository.getTaskList().then((value) {
+      setState(() {
+        tasks = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +56,13 @@ class _ToDoListPageState extends State<ToDoListPage> {
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: "Descrição da tarefa",
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color(0xff00d7f3), width: 2),
+                    ),
+                    labelStyle: TextStyle(
+                      color: Color(0xff00d7f3),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -79,6 +99,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
                         });
                         taskController.clear();
                         taskDescriptionController.clear();
+                        taskListRepository.saveTaskList(tasks);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff00bff3),
@@ -117,7 +138,9 @@ class _ToDoListPageState extends State<ToDoListPage> {
                       ),
                     ),
                     ElevatedButton(
-                      onPressed: tasks.isNotEmpty ? handleConfirmDeleteTasksDialog : null,
+                      onPressed: tasks.isNotEmpty
+                          ? handleConfirmDeleteTasksDialog
+                          : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFE4A49),
                         padding: const EdgeInsets.only(left: 10, right: 10),
@@ -152,6 +175,8 @@ class _ToDoListPageState extends State<ToDoListPage> {
       tasks.remove(task);
     });
 
+    taskListRepository.saveTaskList(tasks);
+
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -166,11 +191,10 @@ class _ToDoListPageState extends State<ToDoListPage> {
           label: 'Desfazer',
           textColor: Colors.black,
           onPressed: () {
-            setState(
-              () {
-                tasks.insert(deletedTaskIndex!, deletedTask!);
-              },
-            );
+            setState(() {
+              tasks.insert(deletedTaskIndex!, deletedTask!);
+            });
+            taskListRepository.saveTaskList(tasks);
           },
         ),
         duration: const Duration(seconds: 5),
@@ -182,6 +206,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
     setState(() {
       tasks.clear();
     });
+    taskListRepository.saveTaskList(tasks);
   }
 
   void handleConfirmDeleteTasksDialog() {
